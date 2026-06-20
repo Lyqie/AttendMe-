@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/29155646/README.md)
 # AttendMe — 云端多模态注意力检测系统
 
 基于云端多模态大模型（DashScope Qwen VL）的实时注意力监测工具。
