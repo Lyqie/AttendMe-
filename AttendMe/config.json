@@ -1,0 +1,37 @@
+{
+    "model": {
+        "provider": "dashscope",
+        "model_name": "qwen3-vl-flash",
+        "api_key": "sk-9956d653a54f44609deab0b558307a2c",
+        "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "timeout_seconds": 30,
+        "max_retries": 2
+    },
+    "capture": {
+        "interval_seconds": 4,
+        "monitor_index": 0,
+        "capture_active_window_only": true,
+        "image_quality": 75,
+        "max_dimension": 1024
+    },
+    "ui": {
+        "opacity": 0.94,
+        "always_on_top": true,
+        "collapsed_size": [190, 260],
+        "expanded_size": [520, 620],
+        "position": [60, 120],
+        "frosted_glass": true
+    },
+    "whitelist": {
+        "process_names": [
+            "devenv.exe",
+            "code.exe",
+            "vim.exe",
+            "nvim.exe",
+            "pycharm64.exe",
+            "idea64.exe"
+        ],
+        "window_titles": []
+    },
+    "ignore_duration_minutes": 5
+}

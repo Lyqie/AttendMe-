@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendMe 期末项目报告</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Nocturne 2.0 — 深海暗色 · 极光点缀 · 玻璃质感
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --void:       #080910;
+  --surface:    #10111c;
+  --elevated:   #16181c;
+  --overlay:    #1c1e2c;
+  --border:     rgba(255,255,255,0.07);
+  --border-glow:rgba(255,255,255,0.12);
+  --text:       #e8e8f5;
+  --text-2:     #9496ac;
+  --text-3:     #646678;
+  --aurora:     #8296ff;
+  --aurora-dim: #5a69b4;
+  --aurora-glow:rgba(130,150,255,0.20);
+  --mint:       #50dcaa;
+  --amber:      #ffaf46;
+  --rose:       #ff6e82;
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: var(--void);
+  color: var(--text);
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 28px 100px;
+  position: relative;
+}
+
+/* ── Ambient decorative orbs ──────────────────────────────────────────── */
+
+body::before, body::after {
+  content: ''; position: fixed; border-radius: 50%;
+  pointer-events: none; z-index: -1;
+}
+body::before {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle at center, rgba(130,150,255,0.04), transparent 70%);
+  top: -200px; right: -200px;
+  animation: orbFloat 20s ease-in-out infinite alternate;
+}
+body::after {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle at center, rgba(80,220,170,0.03), transparent 70%);
+  bottom: -100px; left: -150px;
+  animation: orbFloat 25s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes orbFloat {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(40px, 30px) scale(1.08); }
+}
+
+/* ── Typography ────────────────────────────────────────────────────────── */
+
+h1 { font-size: 2.2rem; font-weight: 250; letter-spacing: 0.02em; }
+h2 {
+  font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--aurora);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 24px;
+}
+h2::before {
+  content: ''; display: inline-block;
+  width: 24px; height: 1.5px; background: var(--aurora); border-radius: 1px;
+  opacity: 0.6;
+}
+h2::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+h3 { font-size: 1rem; font-weight: 450; color: var(--text); margin-bottom: 6px; }
+h4 { font-size: 0.85rem; font-weight: 550; color: var(--text-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+p  { color: var(--text-2); margin-bottom: 12px; }
+p.lead { font-size: 1.1rem; color: var(--text); max-width: 620px; line-height: 1.8; }
+
+.mono {
+  font-family: "Cascadia Code", "Consolas", "SF Mono", "Fira Code", monospace;
+  font-size: 0.82rem;
+}
+
+/* ── Glass card ─────────────────────────────────────────────────────────── */
+
+.glass {
+  background: rgba(16, 17, 28, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.glass.glow {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 40px rgba(130,150,255,0.06);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+.card:hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 30px rgba(130,150,255,0.06);
+}
+
+/* ── Cover ─────────────────────────────────────────────────────────────── */
+
+.cover {
+  position: relative;
+  padding: 80px 0 50px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  overflow: hidden;
+}
+
+/* Ambient gradient orbs behind cover */
+.cover::before, .cover::after {
+  content: ''; position: absolute; border-radius: 50%; pointer-events: none;
+}
+.cover::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(130,150,255,0.06), transparent 60%);
+  top: -250px; left: 50%; transform: translateX(-50%);
+  animation: coverPulse 8s ease-in-out infinite alternate;
+}
+.cover::after {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(80,220,170,0.04), transparent 60%);
+  bottom: -50px; left: 50%; transform: translateX(-50%);
+  animation: coverPulse 10s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes coverPulse {
+  0%   { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scale(1.15); }
+}
+
+/* ── Logo mark ──────────────────────────────────────────────────────────── */
+
+.logo-mark {
+  position: relative; z-index: 1;
+  width: 160px; height: 160px; margin-bottom: 32px;
+  animation: logoEntrance 1s ease-out;
+}
+.logo-mark svg { width: 100%; height: 100%; }
+
+@keyframes logoEntrance {
+  0%   { opacity: 0; transform: scale(0.7) rotate(-10deg); filter: blur(4px); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+}
+
+/* ── Cover text ─────────────────────────────────────────────────────────── */
+
+.cover h1 {
+  position: relative; z-index: 1;
+  font-size: 2.6rem; font-weight: 200;
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, #e8e8f5 0%, #8296ff 50%, #50dcaa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  animation: textEntrance 0.8s ease-out 0.3s both;
+}
+.cover .subtitle {
+  position: relative; z-index: 1;
+  color: var(--text-3); font-size: 0.95rem; font-weight: 350;
+  letter-spacing: 0.08em; max-width: 400px;
+  animation: textEntrance 0.8s ease-out 0.5s both;
+}
+.cover .meta-line {
+  position: relative; z-index: 1;
+  margin-top: 32px;
+  display: flex; gap: 36px;
+  color: var(--text-3); font-size: 0.78rem;
+  animation: textEntrance 0.8s ease-out 0.7s both;
+}
+.cover .meta-line span {
+  padding: 4px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+@keyframes textEntrance {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section entrance animation ─────────────────────────────────────────── */
+
+.section {
+  margin-top: 56px;
+  opacity: 0; transform: translateY(20px);
+  animation: sectionIn 0.7s ease-out forwards;
+}
+.section:nth-child(2)  { animation-delay: 0.1s; }
+.section:nth-child(3)  { animation-delay: 0.2s; }
+.section:nth-child(4)  { animation-delay: 0.3s; }
+.section:nth-child(5)  { animation-delay: 0.4s; }
+.section:nth-child(6)  { animation-delay: 0.5s; }
+.section:nth-child(7)  { animation-delay: 0.6s; }
+.section:nth-child(8)  { animation-delay: 0.7s; }
+.section:nth-child(9)  { animation-delay: 0.8s; }
+.section:nth-child(10) { animation-delay: 0.9s; }
+
+@keyframes sectionIn {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Overview stats ────────────────────────────────────────────────────── */
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+.overview-grid .stat-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 22px 18px; text-align: center;
+  position: relative; overflow: hidden;
+  transition: border-color 300ms ease;
+}
+.overview-grid .stat-item:hover { border-color: var(--border-glow); }
+.overview-grid .stat-item::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; border-radius: 2px; opacity: 0.4;
+}
+.overview-grid .stat-item:nth-child(1)::before { background: var(--aurora); }
+.overview-grid .stat-item:nth-child(2)::before { background: var(--mint); }
+.overview-grid .stat-item:nth-child(3)::before { background: var(--amber); }
+.overview-grid .stat-value {
+  font-size: 2rem; font-weight: 250; letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.overview-grid .stat-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-3); margin-top: 6px; font-weight: 500;
+}
+
+/* ── Tech stack — bento grid ────────────────────────────────────────────── */
+
+.tech-bento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tech-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: all 300ms ease;
+  cursor: default;
+}
+.tech-item:hover {
+  border-color: var(--border-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.tech-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; font-weight: 600; font-family: "Cascadia Code", monospace;
+}
+.tech-icon.lang  { background: rgba(130,150,255,0.12); color: var(--aurora); }
+.tech-icon.ui    { background: rgba(108,199,242,0.12); color: #6cc7f2; }
+.tech-icon.cap   { background: rgba(255,110,130,0.12); color: var(--rose); }
+.tech-icon.data  { background: rgba(80,220,170,0.12); color: var(--mint); }
+.tech-icon.api   { background: rgba(255,175,70,0.12); color: var(--amber); }
+.tech-info .tech-name { font-weight: 500; color: var(--text); font-size: 0.92rem; }
+.tech-info .tech-role { font-size: 0.78rem; color: var(--text-3); margin-top: 1px; }
+
+.tech-bento-foot {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  text-align: center;
+}
+.tech-bento-foot p { margin-bottom: 0; font-size: 0.88rem; }
+
+/* ── Feature blocks ────────────────────────────────────────────────────── */
+
+.feature-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 26px;
+  margin-bottom: 14px;
+  transition: all 300ms ease;
+}
+.feature-block:hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 30px rgba(130,150,255,0.04);
+}
+.feature-block .feature-head {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px;
+}
+.feature-block .feature-tag {
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 4px;
+  flex-shrink: 0;
+}
+.tag-flow  { color: var(--mint);  background: rgba(80,220,170,0.10); }
+.tag-drift { color: var(--amber); background: rgba(255,175,70,0.10); }
+.tag-scat  { color: var(--rose);  background: rgba(255,110,130,0.10); }
+.tag-core  { color: var(--aurora);background: rgba(130,150,255,0.10); }
+.feature-block p { margin-bottom: 8px; }
+.feature-block p:last-child { margin-bottom: 0; }
+
+/* Score tier cards */
+.score-tiers {
+  display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0;
+}
+.score-tier {
+  flex: 1; min-width: 180px;
+  border-radius: var(--radius-md); padding: 16px 18px;
+}
+.score-tier.high { background: rgba(80,220,170,0.05); border: 1px solid rgba(80,220,170,0.12); }
+.score-tier.mid  { background: rgba(255,175,70,0.05); border: 1px solid rgba(255,175,70,0.12); }
+.score-tier.low  { background: rgba(255,110,130,0.05); border: 1px solid rgba(255,110,130,0.12); }
+
+/* ── Architecture diagram ──────────────────────────────────────────────── */
+
+.arch-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.arch-wrapper::before {
+  content: ''; position: absolute; top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 80% 30%, rgba(130,150,255,0.02), transparent 50%);
+  pointer-events: none;
+}
+
+.arch-diagram {
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.arch-box {
+  background: var(--elevated);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  text-align: center; min-width: 110px;
+  position: relative;
+  transition: all 300ms ease;
+}
+.arch-box:hover {
+  border-color: var(--aurora);
+  box-shadow: 0 0 24px rgba(130,150,255,0.12);
+}
+.arch-box.entry {
+  border-color: var(--aurora);
+  background: rgba(130,150,255,0.04);
+  box-shadow: 0 0 30px rgba(130,150,255,0.08);
+}
+.arch-box .arch-label {
+  font-size: 0.88rem; font-weight: 550; color: var(--text);
+}
+.arch-box .arch-sub {
+  font-size: 0.7rem; color: var(--text-3); margin-top: 3px;
+}
+.arch-arrow-down {
+  color: var(--text-3); font-size: 1rem; padding: 6px 0;
+  text-align: center; opacity: 0.5;
+}
+.arch-bracket {
+  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  position: relative;
+  padding: 18px 20px 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--radius-lg);
+  margin: 0 8px;
+}
+.arch-bracket-label {
+  position: absolute; top: -9px; left: 24px;
+  background: var(--surface); padding: 0 10px;
+  font-size: 0.68rem; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+/* Data flow pipe */
+.flow-pipe {
+  display: flex; align-items: center; gap: 4px;
+  flex-wrap: wrap; justify-content: center;
+  margin-top: 10px; padding: 12px 16px;
+  background: rgba(130,150,255,0.03);
+  border: 1px solid rgba(130,150,255,0.06);
+  border-radius: 100px;
+}
+.flow-step {
+  font-size: 0.75rem; color: var(--text-2);
+  padding: 4px 12px;
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  white-space: nowrap;
+  transition: all 200ms ease;
+}
+.flow-step:hover {
+  border-color: var(--aurora-dim);
+  background: rgba(130,150,255,0.06);
+}
+.flow-arr {
+  color: var(--aurora-dim); font-size: 0.8rem; opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ── Code block ────────────────────────────────────────────────────────── */
+
+.code-block {
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px; margin: 10px 0 14px;
+  overflow-x: auto;
+  font-family: "Cascadia Code", "Consolas", "SF Mono", "Fira Code", monospace;
+  font-size: 0.8rem; line-height: 1.6;
+  color: var(--text-2);
+  position: relative;
+}
+.code-block::before {
+  content: 'code'; position: absolute; top: 8px; right: 12px;
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-3); font-family: "Segoe UI",sans-serif; opacity: 0.4;
+}
+.code-block .kw  { color: #c792ea; }
+.code-block .str { color: #c3e88d; }
+.code-block .cmt { color: var(--text-3); font-style: italic; }
+.code-block .fn  { color: #82aaff; }
+.code-block .num { color: #f78c6c; }
+
+/* ── Color swatches ────────────────────────────────────────────────────── */
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.swatch {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 200ms ease;
+}
+.swatch:hover { border-color: var(--border-glow); }
+.swatch-chip {
+  width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+}
+.swatch-info .swatch-name { font-size: 0.78rem; color: var(--text); }
+.swatch-info .swatch-hex  { font-size: 0.68rem; color: var(--text-3); font-family: "Cascadia Code","Consolas",monospace; }
+
+/* ── Score pills ───────────────────────────────────────────────────────── */
+
+.score-pill {
+  display: inline-block; padding: 2px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 550;
+  font-family: "Cascadia Code","Consolas","SF Mono",monospace;
+}
+.score-pill.high { background: rgba(80,220,170,0.15); color: var(--mint); }
+.score-pill.mid  { background: rgba(255,175,70,0.15); color: var(--amber); }
+.score-pill.low  { background: rgba(255,110,130,0.15); color: var(--rose); }
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+
+.data-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md); overflow: hidden;
+}
+.data-table thead th {
+  text-align: left; padding: 10px 16px;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-3); font-weight: 500;
+  background: var(--elevated);
+  border-bottom: 1px solid var(--border);
+}
+.data-table tbody td {
+  padding: 10px 16px; font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-2);
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: var(--overlay); }
+.data-table .mono-cell { font-family: "Cascadia Code","Consolas","SF Mono",monospace; font-size: 0.8rem; }
+
+/* ── File tree ─────────────────────────────────────────────────────────── */
+
+.file-tree {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+}
+.file-tree .tree-item {
+  display: flex; align-items: baseline; gap: 10px; padding: 5px 0;
+  font-size: 0.88rem;
+}
+.file-tree .tree-name {
+  font-family: "Cascadia Code","Consolas","SF Mono",monospace;
+  color: var(--aurora); font-size: 0.85rem; white-space: nowrap; flex-shrink: 0;
+}
+.file-tree .tree-desc { color: var(--text-3); font-size: 0.8rem; }
+.file-tree .tree-dir  {
+  font-family: "Cascadia Code","Consolas","SF Mono",monospace;
+  color: var(--text-2); font-size: 0.82rem; font-weight: 500;
+}
+
+/* ── Future list ───────────────────────────────────────────────────────── */
+
+.future-list {
+  list-style: none; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+.future-list li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-size: 0.85rem; color: var(--text-2);
+  display: flex; align-items: center; gap: 10px;
+  transition: all 300ms ease;
+}
+.future-list li:hover {
+  border-color: var(--border-glow);
+  transform: translateY(-1px);
+}
+.future-list li::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--aurora); flex-shrink: 0;
+  opacity: 0.5;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+
+.report-footer {
+  margin-top: 64px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  color: var(--text-3); font-size: 0.75rem;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 680px) {
+  body { padding: 0 16px 60px; }
+  h1 { font-size: 1.5rem; }
+  .cover { padding: 50px 0 30px; }
+  .cover h1 { font-size: 1.8rem; }
+  .logo-mark { width: 110px; height: 110px; margin-bottom: 22px; }
+  .overview-grid { grid-template-columns: 1fr; }
+  .tech-bento { grid-template-columns: 1fr; }
+  .arch-bracket { flex-direction: column; align-items: center; }
+  .flow-pipe { border-radius: var(--radius-md); }
+  .future-list { grid-template-columns: 1fr; }
+  .cover .meta-line { flex-wrap: wrap; gap: 10px; }
+  .section:nth-child(2) { animation-delay: 0s; }
+  .section:nth-child(3) { animation-delay: 0s; }
+  .section:nth-child(4) { animation-delay: 0s; }
+  .section:nth-child(5) { animation-delay: 0s; }
+  .section:nth-child(6) { animation-delay: 0s; }
+  .section:nth-child(7) { animation-delay: 0s; }
+  .section:nth-child(8) { animation-delay: 0s; }
+  .section:nth-child(9) { animation-delay: 0s; }
+  .section:nth-child(10){ animation-delay: 0s; }
+  .section { animation: none; opacity: 1; transform: none; }
+  .score-tiers { flex-direction: column; }
+}
+
+@media print {
+  html { background: #fff; color: #1a1a1a; font-size: 11px; }
+  body { max-width: 100%; padding: 20px; }
+  body::before, body::after, .cover::before, .cover::after { display: none; }
+  .card, .feature-block, .tech-item, .file-tree, .code-block, .data-table,
+  .swatch, .future-list li, .flow-pipe, .arch-wrapper, .arch-box, .arch-bracket {
+    background: #fafafa !important; border: 1px solid #ddd !important; box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .cover h1 { -webkit-text-fill-color: #1a1a1a; background: none; }
+  .glow { box-shadow: none !important; }
+  .section { animation: none; opacity: 1; transform: none; }
+  .logo-mark { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     封面
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<header class="cover">
+  <!-- 全新几何徽标：聚焦准星 × 字母 A × 环形监测 -->
+  <div class="logo-mark">
+    <svg viewBox="0 0 160 160">
+      <defs>
+        <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#50dcaa"/>
+          <stop offset="50%" stop-color="#8296ff"/>
+          <stop offset="100%" stop-color="#5a69b4"/>
+        </linearGradient>
+        <linearGradient id="lg2" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="#8296ff"/>
+          <stop offset="100%" stop-color="#50dcaa"/>
+        </linearGradient>
+        <filter id="gGlow">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="sGlow">
+          <feGaussianBlur stdDeviation="1.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Outer sensing ring (dashed) — represents monitoring/scannning -->
+      <circle cx="80" cy="80" r="64" fill="none" stroke="rgba(130,150,255,0.08)" stroke-width="0.5"/>
+      <circle cx="80" cy="80" r="62" fill="none" stroke="rgba(130,150,255,0.15)" stroke-width="1.2"
+              stroke-dasharray="3 6" stroke-linecap="round"/>
+      <circle cx="80" cy="80" r="58" fill="none" stroke="rgba(130,150,255,0.05)" stroke-width="0.5"/>
+
+      <!-- Tick marks at cardinal points -->
+      <g stroke="rgba(130,150,255,0.25)" stroke-width="1.5" stroke-linecap="round">
+        <line x1="80" y1="16" x2="80" y2="22"/>
+        <line x1="80" y1="138" x2="80" y2="144"/>
+        <line x1="16" y1="80" x2="22" y2="80"/>
+        <line x1="138" y1="80" x2="144" y2="80"/>
+      </g>
+
+      <!-- Geometric "A" constructed from sweeping curves — the attention apex -->
+      <path d="M 55 105 Q 55 55 80 42 Q 105 55 105 105"
+            fill="none" stroke="url(#lg1)" stroke-width="3.5" stroke-linecap="round" filter="url(#sGlow)"/>
+
+      <!-- Crossbar of the A — horizon line -->
+      <line x1="62" y1="82" x2="98" y2="82"
+            stroke="url(#lg2)" stroke-width="2.5" stroke-linecap="round"/>
+
+      <!-- Inner focus ring — the attention target -->
+      <circle cx="80" cy="62" r="18" fill="none" stroke="rgba(130,150,255,0.25)" stroke-width="1.2"/>
+      <circle cx="80" cy="62" r="14" fill="none" stroke="url(#lg2)" stroke-width="1.8" opacity="0.6"/>
+
+      <!-- Central focal dot — point of attention -->
+      <circle cx="80" cy="62" r="3.5" fill="#50dcaa" filter="url(#gGlow)"/>
+
+      <!-- Micro crosshair around focal point -->
+      <g stroke="rgba(130,150,255,0.3)" stroke-width="0.8" stroke-linecap="round">
+        <line x1="80" y1="52" x2="80" y2="56"/>
+        <line x1="80" y1="68" x2="80" y2="72"/>
+        <line x1="70" y1="62" x2="74" y2="62"/>
+        <line x1="86" y1="62" x2="90" y2="62"/>
+      </g>
+
+      <!-- Glow dot labels: 流·动 (subtle text arcs) -->
+      <text x="80" y="148" text-anchor="middle" fill="#646678"
+            font-family="Segoe UI,PingFang SC,sans-serif" font-size="7" letter-spacing="0.4"
+            opacity="0.4">ATTEND · MONITOR · FOCUS</text>
+    </svg>
+  </div>
+
+  <h1>AttendMe</h1>
+  <p class="subtitle">基于云端多模态大模型的实时注意力检测系统</p>
+  <div class="meta-line">
+    <span>期末项目报告</span>
+    <span>2026 年 6 月</span>
+    <span>Python · PySide6 · DashScope Qwen VL</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     1. 项目概述
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>项目概述</h2>
+
+  <p class="lead">
+    AttendMe 是一款 Windows 桌面注意力监测工具。它以固定间隔捕获用户屏幕截图，
+    通过云端多模态视觉大模型（DashScope Qwen VL）分析当前活动内容，实时给出
+    0–100 的专注度评分，帮助用户量化并改善数字工作习惯。
+  </p>
+
+  <div class="overview-grid">
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--aurora)">4s</div>
+      <div class="stat-label">截图检测间隔</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--mint)">0–100</div>
+      <div class="stat-label">专注度评分范围</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--amber)">3 档</div>
+      <div class="stat-label">注意力分级体系</div>
+    </div>
+  </div>
+
+  <div class="glass glow" style="margin-top:20px; padding:22px 24px;">
+    <h4>设计理念</h4>
+    <p>
+      云端 AI 分析 + 本地轻量 UI。所有计算密集的视觉理解任务卸载到云端，
+      本地仅运行一个轻量级 PySide6 悬浮窗，负责截屏捕获、结果展示与数据记录。
+      用户无需高性能 GPU，一台普通办公电脑即可使用。
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     2. 技术栈
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>技术栈</h2>
+
+  <div class="tech-bento">
+    <div class="tech-item">
+      <div class="tech-icon lang">Py</div>
+      <div class="tech-info">
+        <div class="tech-name">Python 3.10+</div>
+        <div class="tech-role">核心语言</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon ui">Q</div>
+      <div class="tech-info">
+        <div class="tech-name">PySide6 ≥ 6.6</div>
+        <div class="tech-role">桌面 GUI 框架 (Qt)</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon cap">SS</div>
+      <div class="tech-info">
+        <div class="tech-name">mss ≥ 9.0</div>
+        <div class="tech-role">跨平台屏幕捕获</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon data">PIL</div>
+      <div class="tech-info">
+        <div class="tech-name">Pillow ≥ 10.0</div>
+        <div class="tech-role">图像压缩/编码</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon api">RQ</div>
+      <div class="tech-info">
+        <div class="tech-name">requests ≥ 2.31</div>
+        <div class="tech-role">HTTP API 通信</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon data">SL</div>
+      <div class="tech-info">
+        <div class="tech-name">SQLite (WAL)</div>
+        <div class="tech-role">本地数据持久化</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon api">DW</div>
+      <div class="tech-info">
+        <div class="tech-name">DashScope API</div>
+        <div class="tech-role">Qwen VL 云端推理</div>
+      </div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon cap">W32</div>
+      <div class="tech-info">
+        <div class="tech-name">Win32 ctypes</div>
+        <div class="tech-role">前台窗口检测</div>
+      </div>
+    </div>
+    <div class="tech-bento-foot">
+      <p>
+        仅依赖 <strong>4 个第三方包</strong>（PySide6 / mss / Pillow / requests），
+        SQLite 和 ctypes 均为 Python 标准库。安装三步即用。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     3. 核心功能
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>核心功能</h2>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-core">AI 评分</span>
+      <h3>云端多模态专注度评分</h3>
+    </div>
+    <p>
+      系统将屏幕截图编码为 base64 JPEG，调用 DashScope Qwen VL 模型进行分析。
+      System Prompt 将人类活动划分为三个专注层级：
+    </p>
+    <div class="score-tiers">
+      <div class="score-tier high">
+        <span class="score-pill high">80–100</span>
+        <div style="color:var(--mint);font-weight:500;margin-top:6px;">流动 Flow</div>
+        <div style="font-size:0.78rem;color:var(--text-3);margin-top:2px;">编程、写作、设计、数据分析、阅读论文</div>
+      </div>
+      <div class="score-tier mid">
+        <span class="score-pill mid">40–79</span>
+        <div style="color:var(--amber);font-weight:500;margin-top:6px;">浮动 Drifting</div>
+        <div style="font-size:0.78rem;color:var(--text-3);margin-top:2px;">邮件、网页浏览、会议、项目管理、工作聊天</div>
+      </div>
+      <div class="score-tier low">
+        <span class="score-pill low">0–39</span>
+        <div style="color:var(--rose);font-weight:500;margin-top:6px;">分散 Scattered</div>
+        <div style="font-size:0.78rem;color:var(--text-3);margin-top:2px;">社交媒体、视频、游戏、空闲桌面、股票交易</div>
+      </div>
+    </div>
+    <p>
+      模型返回 JSON 结构化结果，包含 <span class="mono">score / category / activity / reasoning</span> 四个字段，
+      支持代码块包裹、尾部逗号等常见格式变体的容错解析。
+    </p>
+  </div>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-flow">悬浮窗</span>
+      <h3>悬浮窗 —— 折叠态</h3>
+    </div>
+    <p>
+      190×260px 无边框置顶窗口，通过 Windows DWM API 实现毛玻璃（Acrylic/亚克力）背景效果。
+      核心视觉元素为 QPainter 手绘的<strong>环形分数进度条</strong>：
+      SVG 弧线随分数变化以动画过渡，外圈带有呼吸式脉冲光晕。
+      同时显示当前活动窗口标题及两个操作按钮（临时忽略 / 展开详情）。
+      窗口可自由拖拽，右键弹出上下文菜单。
+    </p>
+  </div>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-flow">仪表盘</span>
+      <h3>展开面板 —— 仪表盘态</h3>
+    </div>
+    <p>520×620px 详细仪表盘，包含以下子组件：</p>
+    <ul style="color:var(--text-2);padding-left:20px;margin:8px 0;">
+      <li><strong>环形分数</strong>：与悬浮窗同步的专注度可视化</li>
+      <li><strong>统计面板</strong>：今日专注时长、平均分、打断次数</li>
+      <li><strong>历史趋势图</strong>：平滑折线图 + 渐变面积填充，含高/中/低三档区域色带，支持 5 / 15 / 60 分钟时间范围切换</li>
+      <li><strong>JSON 导出按钮</strong>：一键导出全部采样记录</li>
+    </ul>
+    <p>
+      图表使用 <span class="mono">QPainter</span> 纯手绘实现，无第三方图表库依赖。
+      包含点阵网格、坐标轴标注、渐变填充、悬停检测等完整图表功能。
+    </p>
+  </div>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-core">智能</span>
+      <h3>白名单系统</h3>
+    </div>
+    <p>
+      用户可配置进程名（如 <span class="mono">code.exe / pycharm64.exe</span>）或窗口标题为白名单。
+      命中白名单的应用自动获得 <strong>95 分</strong>，无需调用 API，节省配额并降低延迟。
+      支持通过 config.json 预配置，或运行时通过右键菜单动态添加。
+    </p>
+  </div>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-drift">暂离</span>
+      <h3>临时忽略机制</h3>
+    </div>
+    <p>
+      用户可临时忽略当前窗口，默认持续 <strong>5 分钟</strong>（可在配置中调整）。
+      被忽略的窗口自动获得 <strong>80 分</strong>，同样无需调用 API。
+      过期后自动恢复检测。适用于短暂休息、查阅文档等场景。
+    </p>
+  </div>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-core">数据</span>
+      <h3>数据持久化与系统托盘</h3>
+    </div>
+    <p>
+      所有采样记录存入本地 <strong>SQLite 数据库</strong>（WAL 模式），包含时间戳、分数、
+      分类、活动描述、推理过程、进程名、窗口标题等字段。支持 JSON 格式一键导出。
+    </p>
+    <p>
+      最小化时收缩至<strong>系统托盘</strong>，图标为程序绘制的极光主题 "A" 字圆形图标。
+      托盘菜单提供显示悬浮窗、展开详情、退出应用等操作。
+    </p>
+  </div>
+
+  <div class="feature-block">
+    <div class="feature-head">
+      <span class="feature-tag tag-scat">容错</span>
+      <h3>启动健康检查与错误处理</h3>
+    </div>
+    <p>
+      启动时自动验证 API 连通性，获取可用模型列表并过滤出视觉语言模型。
+      若 API 不可达，弹出中文警告对话框。
+    </p>
+    <p>
+      运行时追踪连续推理错误次数：<strong>连续 3 次失败</strong>后自动停止截图定时器，
+      弹出严重错误对话框并提供重新启动监测的选项，防止静默失效。
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     4. 系统架构
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>系统架构</h2>
+
+  <p>项目采用模块化设计，5 个 Python 源文件各司其职，由 <span class="mono">main.py</span> 统一编排。</p>
+
+  <div class="arch-wrapper" style="margin-top:16px;">
+    <div class="arch-diagram">
+      <!-- Entry point -->
+      <div class="arch-box entry">
+        <div class="arch-label">main.py</div>
+        <div class="arch-sub">应用编排 · 定时器驱动 · 事件分发</div>
+      </div>
+
+      <div class="arch-arrow-down">▼</div>
+
+      <!-- Core modules -->
+      <div class="arch-bracket">
+        <span class="arch-bracket-label">核心模块</span>
+        <div class="arch-box"><div class="arch-label">screen_capture.py</div><div class="arch-sub">mss 截屏 · Win32 窗口检测</div></div>
+        <div class="arch-box"><div class="arch-label">model_inference.py</div><div class="arch-sub">API 客户端 · QThread 推理</div></div>
+        <div class="arch-box"><div class="arch-label">data_manager.py</div><div class="arch-sub">SQLite CRUD · JSON 导出</div></div>
+        <div class="arch-box"><div class="arch-label">ui_components.py</div><div class="arch-sub">悬浮窗 · 仪表盘 · 图表 · 托盘</div></div>
+      </div>
+
+      <div class="arch-arrow-down">▼</div>
+
+      <!-- External -->
+      <div style="display:flex; gap:16px;">
+        <div class="arch-box" style="border-color:rgba(80,220,170,0.2);">
+          <div class="arch-label">SQLite</div>
+          <div class="arch-sub">attendme.db</div>
+        </div>
+        <div class="arch-box" style="border-color:rgba(255,175,70,0.2);">
+          <div class="arch-label">Cloud API</div>
+          <div class="arch-sub">DashScope Qwen VL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data flow -->
+    <div style="margin-top:18px;">
+      <h4 style="margin-bottom:6px;">数据流</h4>
+      <div class="flow-pipe">
+        <span class="flow-step">定时触发</span>
+        <span class="flow-arr">→</span>
+        <span class="flow-step">截取屏幕</span>
+        <span class="flow-arr">→</span>
+        <span class="flow-step">白名单检查</span>
+        <span class="flow-arr">→</span>
+        <span class="flow-step">API 推理</span>
+        <span class="flow-arr">→</span>
+        <span class="flow-step">解析结果</span>
+        <span class="flow-arr">→</span>
+        <span class="flow-step">写入 SQLite</span>
+        <span class="flow-arr">→</span>
+        <span class="flow-step">信号更新 UI</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     5. 核心技术实现
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>核心技术实现</h2>
+
+  <div class="card" style="margin-bottom:14px;">
+    <h4>屏幕捕获与窗口感知</h4>
+    <p>
+      使用 <span class="mono">mss</span> 库进行跨平台快速截屏，支持多显示器配置。
+      截图按配置的最大尺寸缩放并转为 JPEG（质量 75%）以减少 API 传输负载。
+    </p>
+    <p>
+      通过 Windows <span class="mono">user32.dll / kernel32.dll / psapi.dll</span>
+      的 ctypes 调用获取前台窗口信息：
+    </p>
+    <div class="code-block">
+<span class="cmt"># 获取前台窗口句柄 → 进程 ID → 进程名</span>
+<span class="kw">from</span> ctypes <span class="kw">import</span> windll, byref, c_ulong
+hwnd = windll.user32.<span class="fn">GetForegroundWindow</span>()
+pid = c_ulong()
+windll.user32.<span class="fn">GetWindowThreadProcessId</span>(hwnd, byref(pid))
+<span class="cmt"># → OpenProcess + GetModuleBaseNameW 获取进程名</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <h4>云端视觉语言模型调用</h4>
+    <p>
+      API 客户端兼容 OpenAI Chat Completions 格式，支持 DashScope、OpenAI、vLLM 等
+      任意兼容端点。图片以 base64 data URI 形式嵌入请求体：
+    </p>
+    <div class="code-block">
+<span class="cmt"># 请求格式 (OpenAI 兼容)</span>
+{
+  <span class="str">"model"</span>: <span class="str">"qwen3-vl-flash"</span>,
+  <span class="str">"messages"</span>: [{
+    <span class="str">"role"</span>: <span class="str">"user"</span>,
+    <span class="str">"content"</span>: [
+      {<span class="str">"type"</span>: <span class="str">"image_url"</span>, <span class="str">"image_url"</span>: {<span class="str">"url"</span>: <span class="str">"data:image/jpeg;base64,..."</span>}},
+      {<span class="str">"type"</span>: <span class="str">"text"</span>, <span class="str">"text"</span>: <span class="str">"&lt;System Prompt&gt;"</span>}
+    ]
+  }]
+}</div>
+    <p>
+      System Prompt 是评分准确性的关键，明确定义了三档专注层级的具体活动类型、
+      评分区间和判断标准，引导模型输出结构化 JSON。
+      解析函数具备容错能力：自动去除 Markdown 代码块包裹、修复尾部逗号、
+      并在 JSON 解析失败时回退到正则匹配提取关键字段。
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <h4>PySide6 自绘 UI 系统</h4>
+    <p>
+      悬浮窗和仪表盘的核心视觉组件均在 <span class="mono">QPainter</span> 的
+      <span class="mono">paintEvent</span> 中手绘实现，不使用任何 UI 模板或 CSS 框架：
+    </p>
+    <ul style="color:var(--text-2);padding-left:20px;margin:8px 0;">
+      <li><strong>环形进度条</strong>：QPainter 绘制 SVG 弧线路径，QVariantAnimation 驱动 400ms 平滑过渡，外圈叠加半透明光晕层配合 QTimer 实现呼吸脉冲</li>
+      <li><strong>颜色插值</strong>：分数 → 颜色的三阶光谱映射（玫瑰红 → 琥珀橙 → 薄荷绿），HSLA 色彩空间线性插值</li>
+      <li><strong>趋势图</strong>：QPainterPath 折线 + 渐变填充，点阵网格线，坐标轴标签，悬停 tooltip</li>
+      <li><strong>毛玻璃</strong>：调用 <span class="mono">dwmapi.dll</span> DWM 窗口合成 API 设置 Acrylic 亚克力背景</li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <h4>SQLite 数据层</h4>
+    <p>数据库采用 WAL（Write-Ahead Logging）模式，提升并发读写性能。设计三张表：</p>
+    <table class="data-table" style="margin:10px 0;">
+      <thead>
+        <tr><th>表名</th><th>用途</th><th>关键字段</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono-cell">snapshots</td>
+          <td>核心采样记录</td>
+          <td>timestamp, score, category, activity, reasoning, process_name, window_title, ignored</td>
+        </tr>
+        <tr>
+          <td class="mono-cell">whitelist</td>
+          <td>白名单配置</td>
+          <td>pattern (进程名/窗口标题), type (process/title)</td>
+        </tr>
+        <tr>
+          <td class="mono-cell">ignore_list</td>
+          <td>临时忽略记录</td>
+          <td>process, window_title, expires_at</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <span class="mono">snapshots</span> 表在 timestamp 建立索引以支持高效时间范围查询。
+      提供今日统计聚合（COUNT/AVG + CASE WHEN 分类）、应用分布 TOP 10、打断次数检测等查询。
+    </p>
+  </div>
+
+  <div class="card">
+    <h4>多线程架构</h4>
+    <p>
+      推理任务在 <span class="mono">QThread</span> 中执行，通过 Qt 信号槽机制与主线程通信：
+    </p>
+    <ul style="color:var(--text-2);padding-left:20px;margin:8px 0;">
+      <li><span class="mono">result_ready(dict)</span> 信号 → 主线程更新 UI 并写入数据库</li>
+      <li><span class="mono">error_occurred(str)</span> 信号 → 主线程累加错误计数并决定是否告警</li>
+      <li>推理中收到新请求时自动跳过（busy 状态），避免请求堆积</li>
+      <li>应用退出时通过 <span class="mono">QThread.quit() / wait()</span> 安全终止线程</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     6. Nocturne 设计系统
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>Nocturne 设计系统</h2>
+
+  <p>项目定义了一套完整的暗色设计语言，贯穿桌面 GUI 与报告呈现，确保视觉一致性。</p>
+
+  <div style="margin-top:18px;">
+    <h4>配色方案</h4>
+    <div class="swatch-grid" style="margin-top:10px;">
+      <div class="swatch"><span class="swatch-chip" style="background:#080910"></span><div class="swatch-info"><div class="swatch-name">Void 虚空</div><div class="swatch-hex">#080910</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#10111c"></span><div class="swatch-info"><div class="swatch-name">Surface 表层</div><div class="swatch-hex">#10111c</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#16181c"></span><div class="swatch-info"><div class="swatch-name">Elevated 浮层</div><div class="swatch-hex">#16181c</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#1c1e2c"></span><div class="swatch-info"><div class="swatch-name">Overlay 叠加</div><div class="swatch-hex">#1c1e2c</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#8296ff"></span><div class="swatch-info"><div class="swatch-name">Aurora 极光</div><div class="swatch-hex">#8296ff</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#50dcaa"></span><div class="swatch-info"><div class="swatch-name">Mint 薄荷</div><div class="swatch-hex">#50dcaa</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#ffaf46"></span><div class="swatch-info"><div class="swatch-name">Amber 琥珀</div><div class="swatch-hex">#ffaf46</div></div></div>
+      <div class="swatch"><span class="swatch-chip" style="background:#ff6e82"></span><div class="swatch-info"><div class="swatch-name">Rose 蔷薇</div><div class="swatch-hex">#ff6e82</div></div></div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:18px;">
+    <div class="card">
+      <h4>排版规范</h4>
+      <ul style="color:var(--text-2);padding-left:18px;font-size:0.88rem;">
+        <li>系统字体栈：Segoe UI / PingFang SC / Microsoft YaHei</li>
+        <li>等宽字体：Cascadia Code / Consolas / SF Mono</li>
+        <li>标题字重：200–450（极细到中等）</li>
+        <li>正文大小：15px，行高 1.7</li>
+        <li>宽松字距（0.04–0.10em）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>界面特性</h4>
+      <ul style="color:var(--text-2);padding-left:18px;font-size:0.88rem;">
+        <li>圆角三档：8 / 14 / 20px</li>
+        <li>边框透明度 7% 白，悬浮 12%</li>
+        <li>分数三色语义映射</li>
+        <li>毛玻璃（Acrylic）背景</li>
+        <li>极光色光晕装饰</li>
+        <li>动画过渡 300–400ms</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     7. 项目结构
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>项目结构</h2>
+
+  <div class="file-tree">
+    <div class="tree-item"><span class="tree-dir">AttendMe/</span></div>
+    <div class="tree-item"><span class="tree-name">├── main.py</span><span class="tree-desc">入口 · 应用编排 · QTimer 主循环 · 事件分发</span></div>
+    <div class="tree-item"><span class="tree-name">├── screen_capture.py</span><span class="tree-desc">mss 截屏 · base64 编码 · Win32 API 窗口检测</span></div>
+    <div class="tree-item"><span class="tree-name">├── model_inference.py</span><span class="tree-desc">OpenAI 兼容 API · System Prompt · QThread</span></div>
+    <div class="tree-item"><span class="tree-name">├── ui_components.py</span><span class="tree-desc">PySide6 悬浮窗 · 仪表盘 · 环形进度条 · 图表 · 托盘</span></div>
+    <div class="tree-item"><span class="tree-name">├── data_manager.py</span><span class="tree-desc">SQLite(WAL) · 统计查询 · JSON 导出</span></div>
+    <div class="tree-item"><span class="tree-name">├── config.json</span><span class="tree-desc">用户配置 · API 密钥 · 截图参数 · UI · 白名单</span></div>
+    <div class="tree-item"><span class="tree-name">├── requirements.txt</span><span class="tree-desc">依赖清单 (4 个包)</span></div>
+    <div class="tree-item"><span class="tree-name">└── attendme.db</span><span class="tree-desc">SQLite 数据库（运行时自动生成）</span></div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h4>代码规模</h4>
+    <p>
+      核心逻辑约 <strong>1,800 行 Python 代码</strong>，分布于 5 个模块。
+      UI 组件（<span class="mono">ui_components.py</span>）占比最大约 930 行，
+      包含完整的自绘图表和控件系统。整体架构简洁紧凑，无冗余抽象层。
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     8. 配置与扩展
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>配置与扩展</h2>
+
+  <h4>配置文件结构</h4>
+  <p><span class="mono">config.json</span> 是唯一的配置文件，分为五大区块：</p>
+
+  <table class="data-table" style="margin:10px 0 18px;">
+    <thead>
+      <tr><th>区块</th><th>说明</th><th>关键参数</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="mono-cell">model</td><td>模型与 API 配置</td><td>provider, model_name, api_key, api_base, timeout</td></tr>
+      <tr><td class="mono-cell">capture</td><td>截图参数</td><td>interval_seconds(4), max_dimension(1024), image_quality(75)</td></tr>
+      <tr><td class="mono-cell">ui</td><td>界面设置</td><td>always_on_top, frosted_glass, 窗口尺寸</td></tr>
+      <tr><td class="mono-cell">whitelist</td><td>白名单预配置</td><td>process_names[], window_titles[]</td></tr>
+      <tr><td class="mono-cell">ignore</td><td>临时忽略</td><td>ignore_duration_minutes(5)</td></tr>
+    </tbody>
+  </table>
+
+  <h4>多 API 提供商支持</h4>
+  <p>
+    API 层采用 OpenAI 兼容格式，修改 <span class="mono">api_base</span> 和 <span class="mono">model_name</span>
+    即可切换至不同后端：
+  </p>
+
+  <table class="data-table" style="margin:10px 0;">
+    <thead>
+      <tr><th>提供商</th><th>api_base</th><th>model_name 示例</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>DashScope (阿里云)</td><td class="mono-cell">https://dashscope.aliyuncs.com/compatible-mode/v1</td><td class="mono-cell">qwen3-vl-flash</td></tr>
+      <tr><td>OpenAI</td><td class="mono-cell">https://api.openai.com/v1</td><td class="mono-cell">gpt-4o</td></tr>
+      <tr><td>vLLM (自部署)</td><td class="mono-cell">http://your-server:8000/v1</td><td class="mono-cell">任意 VL 模型</td></tr>
+      <tr><td>Ollama (本地)</td><td class="mono-cell">http://localhost:11434/v1</td><td class="mono-cell">llava / minicpm-v</td></tr>
+    </tbody>
+  </table>
+
+  <p>API Key 支持 <span class="mono">config.json</span> 直接填写或通过环境变量 <span class="mono">DASHSCOPE_API_KEY</span> 注入，避免密钥泄露至代码仓库。</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     9. 总结与展望
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<section class="section">
+  <h2>总结与展望</h2>
+
+  <div class="glass glow" style="margin-bottom:20px; padding:24px 26px;">
+    <h4>项目亮点</h4>
+    <ul style="color:var(--text-2);padding-left:20px;">
+      <li><strong>云端 + 本地协同</strong>：将计算密集的视觉理解卸载到云端，本地仅运行轻量 UI，降低硬件门槛</li>
+      <li><strong>精致的桌面 UI</strong>：纯 QPainter 手绘的环形进度条、趋势图、毛玻璃效果，设计完成度高</li>
+      <li><strong>可扩展的 API 层</strong>：OpenAI 兼容格式，支持 4 种以上不同后端，从云端 API 到本地模型均可接入</li>
+      <li><strong>容错设计</strong>：白名单/忽略机制减少 API 调用，连续错误检测防止静默失效，JSON 解析容错</li>
+      <li><strong>完整的 Nocturne 设计系统</strong>：从色彩、排版到动画，建立了可复用的设计语言</li>
+    </ul>
+  </div>
+
+  <h4>未来展望</h4>
+  <ul class="future-list">
+    <li>本地模型支持：集成 ONNX / OpenVINO 实现完全离线运行</li>
+    <li>跨平台适配：macOS / Linux 兼容（替换 Win32 API 调用）</li>
+    <li>数据洞察增强：周报/月报、生产力趋势分析、应用分类热力图</li>
+    <li>智能提醒：分数持续偏低时弹出温和提醒，支持番茄钟模式</li>
+    <li>隐私增强：敏感窗口自动暂停检测、本地推理开关</li>
+    <li>数据同步：支持 WebDAV / S3 云端备份和历史数据跨设备同步</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Footer
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<footer class="report-footer">
+  <span>AttendMe · 注意力监测系统</span>
+  <span>期末报告 · 2026 年 6 月</span>
+</footer>
+
+</body>
+</html>
